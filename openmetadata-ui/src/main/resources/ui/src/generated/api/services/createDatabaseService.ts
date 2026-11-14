@@ -70,6 +70,8 @@ export interface DatabaseConnection {
  *
  * Clickhouse Connection Config
  *
+ * Apache Cloudberry Database Connection Config
+ *
  * Databricks Connection Config
  *
  * Db2 Connection Config
@@ -207,6 +209,8 @@ export interface Connection {
      * Host and port of the AzureSQL service.
      *
      * Host and port of the Clickhouse service.
+     *
+     * Host and port of the Cloudberry coordinator (default port 5432).
      *
      * Host and port of the Databricks service.
      *
@@ -434,6 +438,9 @@ export interface Connection {
      * Ingest data from all databases in Azuresql. You can use databaseFilterPattern on top of
      * this.
      *
+     * Ingest data from all databases in Cloudberry. You can use databaseFilterPattern on top of
+     * this.
+     *
      * Ingest data from all databases in Mssql. You can use databaseFilterPattern on top of
      * this.
      *
@@ -528,6 +535,9 @@ export interface Connection {
      *
      * Username to connect to Clickhouse. This user should have privileges to read all the
      * metadata in Clickhouse.
+     *
+     * Username to connect to Cloudberry. This user should have privileges to read all the
+     * metadata in Cloudberry.
      *
      * Username to connect to DB2. This user should have privileges to read all the metadata in
      * DB2.
@@ -674,6 +684,8 @@ export interface Connection {
      */
     secure?: boolean;
     /**
+     * Password authentication for Cloudberry.
+     *
      * Choose between different authentication types for Databricks.
      *
      * Choose Auth Config Type.
@@ -685,6 +697,26 @@ export interface Connection {
      * Choose between Dremio Cloud (SaaS) or Dremio Software (self-hosted) authentication.
      */
     authType?: AuthenticationType | NoConfigAuthenticationTypes;
+    /**
+     * SSL Configuration details for DB2 connection. Provide CA certificate for server
+     * validation, and optionally client certificate and key for mutual TLS authentication.
+     *
+     * SSL Configuration details.
+     *
+     * SSL/TLS certificate configuration for client authentication. Provide CA certificate,
+     * client certificate, and private key for mutual TLS authentication.
+     *
+     * SSL Configuration details. Provide the CA certificate to validate the Informix server
+     * certificate. Paste the PEM content directly or upload the certificate file.
+     */
+    sslConfig?: Config;
+    /**
+     * SSL Mode to connect to Informix. Use 'disable' for no SSL, 'require' for encrypted SSL
+     * without certificate verification, or 'verify-ca' to validate the server certificate
+     * against the provided CA certificate.
+     */
+    sslMode?:                       SSLMode;
+    supportsViewLineageExtraction?: boolean;
     /**
      * Catalog of the data source(Example: hive_metastore). This is optional parameter, if you
      * would like to restrict the metadata reading to a single catalog. When left blank,
@@ -732,26 +764,6 @@ export interface Connection {
      * License file name to connect to DB2.
      */
     licenseFileName?: string;
-    /**
-     * SSL Configuration details for DB2 connection. Provide CA certificate for server
-     * validation, and optionally client certificate and key for mutual TLS authentication.
-     *
-     * SSL Configuration details.
-     *
-     * SSL/TLS certificate configuration for client authentication. Provide CA certificate,
-     * client certificate, and private key for mutual TLS authentication.
-     *
-     * SSL Configuration details. Provide the CA certificate to validate the Informix server
-     * certificate. Paste the PEM content directly or upload the certificate file.
-     */
-    sslConfig?: Config;
-    /**
-     * SSL Mode to connect to Informix. Use 'disable' for no SSL, 'require' for encrypted SSL
-     * without certificate verification, or 'verify-ca' to validate the server certificate
-     * against the provided CA certificate.
-     */
-    sslMode?:                       SSLMode;
-    supportsViewLineageExtraction?: boolean;
     /**
      * Available sources to fetch the metadata.
      *
@@ -1235,6 +1247,12 @@ export enum AuthMechanismEnum {
 }
 
 /**
+ * Password authentication for Cloudberry.
+ *
+ * Common Database Connection Config
+ *
+ * Choose Auth Config Type.
+ *
  * Choose between different authentication types for Databricks.
  *
  * Personal Access Token authentication for Databricks.
@@ -1244,10 +1262,6 @@ export enum AuthMechanismEnum {
  *
  * Azure Active Directory authentication for Azure Databricks workspaces using Service
  * Principal.
- *
- * Choose Auth Config Type.
- *
- * Common Database Connection Config
  *
  * IAM Auth Database Connection Config
  *
@@ -1268,6 +1282,14 @@ export enum AuthMechanismEnum {
  * Dremio Software is deployed on-premises or in your own cloud infrastructure.
  */
 export interface AuthenticationType {
+    /**
+     * Password to connect to source.
+     *
+     * Database user password. Leave empty if using IAM database authentication.
+     *
+     * Password for the Dremio Software user account.
+     */
+    password?: string;
     /**
      * Generated Personal Access Token for Databricks workspace authentication. This token is
      * created from User Settings -> Developer -> Access Tokens in your Databricks workspace.
@@ -1295,16 +1317,8 @@ export interface AuthenticationType {
      * Azure Active Directory Tenant ID where your Service Principal is registered.
      */
     azureTenantId?: string;
-    /**
-     * Password to connect to source.
-     *
-     * Database user password. Leave empty if using IAM database authentication.
-     *
-     * Password for the Dremio Software user account.
-     */
-    password?:    string;
-    awsConfig?:   AWSCredentials;
-    azureConfig?: AzureCredentials;
+    awsConfig?:     AWSCredentials;
+    azureConfig?:   AzureCredentials;
     /**
      * Use GCP IAM for database authentication instead of a password.
      */
@@ -1527,7 +1541,7 @@ export interface GCPCredentialsConfiguration {
      *
      * Google Cloud Platform ADC ( Application Default Credentials )
      */
-    type?: string;
+    type?: CredentialsType;
     /**
      * Path of the file containing the GCP credentials info
      */
@@ -1545,7 +1559,7 @@ export interface GCPCredentialsConfiguration {
     /**
      * Google Cloud Platform account type.
      */
-    externalType?: string;
+    externalType?: GCPAccountType;
     /**
      * Google Security Token Service subject token type based on the OAuth 2.0 token exchange
      * spec.
@@ -1556,6 +1570,17 @@ export interface GCPCredentialsConfiguration {
      */
     tokenURL?: string;
     [property: string]: any;
+}
+
+export enum GCPAccountType {
+    ExternalAccount = "external_account",
+}
+
+export enum CredentialsType {
+    ExternalAccount = "external_account",
+    GcpADC = "gcp_adc",
+    GcpCredentialPath = "gcp_credential_path",
+    ServiceAccount = "service_account",
 }
 
 /**
@@ -2079,6 +2104,8 @@ export interface HiveMetastoreConnectionDetails {
 /**
  * Choose Auth Config Type.
  *
+ * Password authentication for Cloudberry.
+ *
  * Common Database Connection Config
  *
  * IAM Auth Database Connection Config
@@ -2200,10 +2227,10 @@ export enum HiveMetastoreConnectionDetailsScheme {
 }
 
 /**
+ * Client SSL configuration
+ *
  * SSL Configuration details for DB2 connection. Provide CA certificate for server
  * validation, and optionally client certificate and key for mutual TLS authentication.
- *
- * Client SSL configuration
  *
  * SSL Configuration details.
  *
@@ -2384,6 +2411,7 @@ export enum ConfigType {
     BurstIQ = "BurstIQ",
     Cassandra = "Cassandra",
     Clickhouse = "Clickhouse",
+    Cloudberry = "Cloudberry",
     Cockroach = "Cockroach",
     Couchbase = "Couchbase",
     CustomDatabase = "CustomDatabase",
@@ -2517,6 +2545,7 @@ export enum DatabaseServiceType {
     BurstIQ = "BurstIQ",
     Cassandra = "Cassandra",
     Clickhouse = "Clickhouse",
+    Cloudberry = "Cloudberry",
     Cockroach = "Cockroach",
     Couchbase = "Couchbase",
     CustomDatabase = "CustomDatabase",

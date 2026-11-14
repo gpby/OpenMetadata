@@ -744,6 +744,7 @@ export enum DatabaseServiceType {
     BurstIQ = "BurstIQ",
     Cassandra = "Cassandra",
     Clickhouse = "Clickhouse",
+    Cloudberry = "Cloudberry",
     Cockroach = "Cockroach",
     Couchbase = "Couchbase",
     CustomDatabase = "CustomDatabase",

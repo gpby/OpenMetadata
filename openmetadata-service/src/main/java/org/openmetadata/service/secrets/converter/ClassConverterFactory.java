@@ -29,6 +29,7 @@ import org.openmetadata.schema.services.connections.dashboard.ThoughtSpotConnect
 import org.openmetadata.schema.services.connections.database.BigQueryConnection;
 import org.openmetadata.schema.services.connections.database.BigTableConnection;
 import org.openmetadata.schema.services.connections.database.CassandraConnection;
+import org.openmetadata.schema.services.connections.database.CloudberryConnection;
 import org.openmetadata.schema.services.connections.database.CockroachConnection;
 import org.openmetadata.schema.services.connections.database.DatabricksConnection;
 import org.openmetadata.schema.services.connections.database.DatalakeConnection;
@@ -100,6 +101,7 @@ public final class ClassConverterFactory {
             Map.entry(MssqlConnection.class, new MssqlConnectionClassConverter()),
             Map.entry(MysqlConnection.class, new MysqlConnectionClassConverter()),
             Map.entry(RedshiftConnection.class, new RedshiftConnectionClassConverter()),
+            Map.entry(CloudberryConnection.class, new CloudberryConnectionClassConverter()),
             Map.entry(GreenplumConnection.class, new GreenplumConnectionClassConverter()),
             Map.entry(PostgresConnection.class, new PostgresConnectionClassConverter()),
             Map.entry(SapHanaConnection.class, new SapHanaConnectionClassConverter()),

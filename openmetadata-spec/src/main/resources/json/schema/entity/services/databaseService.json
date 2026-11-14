@@ -21,6 +21,7 @@
         "Redshift",
         "Snowflake",
         "Postgres",
+        "Cloudberry",
         "Timescale",
         "Mssql",
         "MicrosoftAccess",
@@ -93,6 +94,9 @@
         },
         {
           "name": "Postgres"
+        },
+        {
+          "name": "Cloudberry"
         },
         {
           "name": "Timescale"
@@ -279,6 +283,9 @@
             },
             {
               "$ref": "./connections/database/clickhouseConnection.json"
+            },
+            {
+              "$ref": "./connections/database/cloudberryConnection.json"
             },
             {
               "$ref": "./connections/database/databricksConnection.json"

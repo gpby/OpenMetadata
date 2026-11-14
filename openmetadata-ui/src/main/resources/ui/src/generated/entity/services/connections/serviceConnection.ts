@@ -111,6 +111,8 @@ export interface ServiceConnectionClass {
  *
  * Clickhouse Connection Config
  *
+ * Apache Cloudberry Database Connection Config
+ *
  * Databricks Connection Config
  *
  * Db2 Connection Config
@@ -530,6 +532,8 @@ export interface Connection {
      *
      * Host and port of the Clickhouse service.
      *
+     * Host and port of the Cloudberry coordinator (default port 5432).
+     *
      * Host and port of the Databricks service.
      *
      * Host and port of the DB2 service.
@@ -753,6 +757,9 @@ export interface Connection {
      * Username to connect to Clickhouse. This user should have privileges to read all the
      * metadata in Clickhouse.
      *
+     * Username to connect to Cloudberry. This user should have privileges to read all the
+     * metadata in Cloudberry.
+     *
      * Username to connect to DB2. This user should have privileges to read all the metadata in
      * DB2.
      *
@@ -954,6 +961,8 @@ export interface Connection {
      *
      * Choose Basic Auth (username/password) for on-premise or OAuth 2.0 Client Credentials for
      * SAP S/4HANA Cloud.
+     *
+     * Password authentication for Cloudberry.
      *
      * Choose between different authentication types for Databricks.
      *
@@ -1295,6 +1304,9 @@ export interface Connection {
      * Ingest data from all databases in Azuresql. You can use databaseFilterPattern on top of
      * this.
      *
+     * Ingest data from all databases in Cloudberry. You can use databaseFilterPattern on top of
+     * this.
+     *
      * Ingest data from all databases in Mssql. You can use databaseFilterPattern on top of
      * this.
      *
@@ -1354,6 +1366,13 @@ export interface Connection {
      */
     secure?: boolean;
     /**
+     * SSL Mode to connect to Informix. Use 'disable' for no SSL, 'require' for encrypted SSL
+     * without certificate verification, or 'verify-ca' to validate the server certificate
+     * against the provided CA certificate.
+     */
+    sslMode?:                       SSLMode;
+    supportsViewLineageExtraction?: boolean;
+    /**
      * Catalog of the data source(Example: hive_metastore). This is optional parameter, if you
      * would like to restrict the metadata reading to a single catalog. When left blank,
      * OpenMetadata Ingestion attempts to scan all the catalog.
@@ -1404,13 +1423,6 @@ export interface Connection {
      * License file name to connect to DB2.
      */
     licenseFileName?: string;
-    /**
-     * SSL Mode to connect to Informix. Use 'disable' for no SSL, 'require' for encrypted SSL
-     * without certificate verification, or 'verify-ca' to validate the server certificate
-     * against the provided CA certificate.
-     */
-    sslMode?:                       SSLMode;
-    supportsViewLineageExtraction?: boolean;
     /**
      * Available sources to fetch the metadata.
      *
@@ -2585,6 +2597,12 @@ export enum AuthProvider {
  *
  * OAuth 2.0 client credentials for SAP S/4HANA Cloud.
  *
+ * Common Database Connection Config
+ *
+ * Password authentication for Cloudberry.
+ *
+ * Choose Auth Config Type.
+ *
  * Choose between different authentication types for Databricks.
  *
  * Personal Access Token authentication for Databricks.
@@ -2594,10 +2612,6 @@ export enum AuthProvider {
  *
  * Azure Active Directory authentication for Azure Databricks workspaces using Service
  * Principal.
- *
- * Choose Auth Config Type.
- *
- * Common Database Connection Config
  *
  * IAM Auth Database Connection Config
  *
@@ -3057,7 +3071,7 @@ export interface GCPCredentialsConfiguration {
      *
      * Google Cloud Platform ADC ( Application Default Credentials )
      */
-    type?: string;
+    type?: CredentialsType;
     /**
      * Path of the file containing the GCP credentials info
      */
@@ -3075,7 +3089,7 @@ export interface GCPCredentialsConfiguration {
     /**
      * Google Cloud Platform account type.
      */
-    externalType?: string;
+    externalType?: GCPAccountType;
     /**
      * Google Security Token Service subject token type based on the OAuth 2.0 token exchange
      * spec.
@@ -3086,6 +3100,17 @@ export interface GCPCredentialsConfiguration {
      */
     tokenURL?: string;
     [property: string]: any;
+}
+
+export enum GCPAccountType {
+    ExternalAccount = "external_account",
+}
+
+export enum CredentialsType {
+    ExternalAccount = "external_account",
+    GcpADC = "gcp_adc",
+    GcpCredentialPath = "gcp_credential_path",
+    ServiceAccount = "service_account",
 }
 
 /**
@@ -3933,6 +3958,8 @@ export interface MWAAConfiguration {
  * Choose Auth Config Type.
  *
  * Common Database Connection Config
+ *
+ * Password authentication for Cloudberry.
  *
  * IAM Auth Database Connection Config
  *
@@ -5170,6 +5197,7 @@ export enum AirflowConnectionType {
     BurstIQ = "BurstIQ",
     Cassandra = "Cassandra",
     Clickhouse = "Clickhouse",
+    Cloudberry = "Cloudberry",
     Cockroach = "Cockroach",
     Collibra = "Collibra",
     Couchbase = "Couchbase",

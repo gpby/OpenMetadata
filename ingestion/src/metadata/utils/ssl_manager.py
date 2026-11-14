@@ -32,6 +32,7 @@ from metadata.generated.schema.entity.services.connections.dashboard.qlikSenseCo
 from metadata.generated.schema.entity.services.connections.database.cassandraConnection import (
     CassandraConnection,
 )
+from metadata.generated.schema.entity.services.connections.database.cloudberryConnection import CloudberryConnection
 from metadata.generated.schema.entity.services.connections.database.db2Connection import (
     Db2Connection,
 )
@@ -162,9 +163,10 @@ class SSLManager:
     @setup_ssl.register(PostgresConnection)
     @setup_ssl.register(RedshiftConnection)
     @setup_ssl.register(GreenplumConnection)
+    @setup_ssl.register(CloudberryConnection)
     def _(self, connection):
         connection = cast(
-            Union[PostgresConnection, RedshiftConnection, GreenplumConnection],  # noqa: TC006, UP007
+            Union[PostgresConnection, RedshiftConnection, GreenplumConnection, CloudberryConnection],  # noqa: TC006, UP007
             connection,
         )
 
@@ -487,9 +489,10 @@ def _(connection, *args, **kwargs):
 @check_ssl_and_init.register(PostgresConnection)
 @check_ssl_and_init.register(RedshiftConnection)
 @check_ssl_and_init.register(GreenplumConnection)
+@check_ssl_and_init.register(CloudberryConnection)
 def _(connection):
     connection = cast(
-        Union[PostgresConnection, RedshiftConnection, GreenplumConnection],  # noqa: TC006, UP007
+        Union[PostgresConnection, RedshiftConnection, GreenplumConnection, CloudberryConnection],  # noqa: TC006, UP007
         connection,
     )
     # Previously only caCertificate was extracted, causing sslCertificate and sslKey

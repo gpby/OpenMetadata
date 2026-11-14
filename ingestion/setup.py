@@ -337,6 +337,7 @@ plugins: Dict[str, Set[str]] = {  # noqa: UP006
     },
     "glue": {VERSIONS["boto3"]},
     "great-expectations": {VERSIONS["great-expectations"]},
+    "cloudberry": {*COMMONS["postgres"]},
     "greenplum": {*COMMONS["postgres"]},
     "cockroach": {
         VERSIONS["cockroach"],
